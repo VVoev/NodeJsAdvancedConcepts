@@ -1,4 +1,7 @@
+process.env.UV_THREADPOOL_SIZE = 1;
+
 const express = require('express');
+const crypto = require('crypto');
 const app = express();
 const cluster = require('cluster');
 
@@ -11,16 +14,16 @@ if (cluster.isMaster) {
     cluster.fork();
 } else {
     //im a child,im goint to act like a server and nothing else
-    function doWork(duration) {
-        const start = Date.now();
-        while (Date.now() - start < duration) {
 
-        }
-    }
 
     app.get('/', (req, res) => {
-        doWork(5000);
-        res.send('hi there');
+        crypto.pbkdf2('a', 'b', 100000, 512, 'sha512', () => {
+            res.send('hi there');
+        })
+    })
+
+    app.get('/fast', (req, res) => {
+        res.send('this was fast');
     })
 
     app.listen(port, () => {
